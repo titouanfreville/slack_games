@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  # Base descriptions
+  slack_games-python_app:
+    &python_app
+    build:
+      context: ./
+      dockerfile: infra/images/local/api.Dockerfile
+    volumes:
+      - .:/home/app
+    # env_file: .env
+    command:
+      - "/bin/bash"
+    environment:
+      - PYTHONUNBUFFERED=TRUE
+
+  slack_games-env:
+    <<: *python_app
+    container_name: slack_games-env
+    command:
+      # - "echo"
+      # - "Running"
+      # - "&&"
+      - "tail"
+      - "-f"
+      - "/dev/null"

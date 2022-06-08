@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  slack_games-env:
+    volumes:
+      - .:/workspace:cached
+      - slack-games-home:/home/vscode
+volumes:
+  slack-games-home:
