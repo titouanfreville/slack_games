@@ -3,8 +3,10 @@ from os import path
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
+from starlette.requests import Request
 
 from app import api
+from app.core.context import RestContext
 
 basedir = path.dirname(__file__)
 
@@ -23,7 +25,10 @@ serve.add_middleware(
 
 
 @serve.get("/")
-async def home():
+async def home(request: Request):
+    with RestContext(request) as ctx:
+        print(ctx)
+
     return {"Hello": "Environment ZAP: {}".format("local")}
 
 
