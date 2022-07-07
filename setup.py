@@ -17,6 +17,7 @@ setup(
         "sentry-sdk~=1.3",
         "shortuuid~=1.0",
         "uvicorn[standard]~=0.11",
+        "pytz",
     ],
     extras_require={
         "ci": [

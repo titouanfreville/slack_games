@@ -30,7 +30,7 @@ class Details(BaseModel):
     value: Optional[Any] = None
 
 
-class BetException(Exception, ABC):
+class BaseException(Exception, ABC):
     status: int = HTTPStatus.IM_A_TEAPOT
 
     @abstractmethod
@@ -43,7 +43,7 @@ class BetException(Exception, ABC):
         raise NotImplementedError()
 
 
-class ErrUnexpected(BetException):
+class ErrUnexpected(BaseException):
     """
     ErrUnexpected represents global exception for errors that should not happen
     and we don't wish to provide information to end user.
@@ -61,7 +61,7 @@ class ErrUnexpected(BetException):
         return _new_precise_error(type(self), new_name, details)
 
 
-class ErrNonBlockingUnexpected(BetException):
+class ErrNonBlockingUnexpected(BaseException):
     """
     ErrUnexpected represents global exception for errors that should not happen
     and we don't wish to provide information to end user.
@@ -82,7 +82,7 @@ class ErrNonBlockingUnexpected(BetException):
         return _new_precise_error(type(self), new_name, self.__error)
 
 
-class ErrUnauthorized(BetException):
+class ErrUnauthorized(BaseException):
     """
     ErrUnauthorized represents authorization erros that happen when a login status
     is required but none exists.
@@ -103,7 +103,7 @@ class ErrUnauthorized(BetException):
         return _new_precise_error(type(self), new_name)
 
 
-class ErrTooManyRequest(BetException):
+class ErrTooManyRequest(BaseException):
     """
     ErrTooManyRequest represents contention errors where too many request are sent
     ever to API or to external services.
@@ -124,7 +124,7 @@ class ErrTooManyRequest(BetException):
         return _new_precise_error(type(self), new_name)
 
 
-class ErrAborted(BetException):
+class ErrAborted(BaseException):
     """
     ErrAborted represents errors when request was cancelled due to
     external services not managing it.
@@ -145,7 +145,7 @@ class ErrAborted(BetException):
         return _new_precise_error(type(self), new_name)
 
 
-class ErrNotFound(BetException):
+class ErrNotFound(BaseException):
     """
     ErrUnotFound has to be raised if data was expected but
     not does not exits.
@@ -170,7 +170,7 @@ class ErrNotFound(BetException):
         return _new_precise_error(type(self), f"{pascalcase(self.__key)}NotFound", self.__key)
 
 
-class ErrInvalidData(BetException):
+class ErrInvalidData(BaseException):
     """
     ErrInvalidData propagate invalid data informations.
     """

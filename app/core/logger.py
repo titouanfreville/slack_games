@@ -5,9 +5,11 @@ from logging import DEBUG, ERROR, INFO, WARNING, Logger, getLevelName, getLogger
 from typing import Any, Dict, Optional
 
 from app.core import Context
-from app.domain.errors import BetException
-from app.tasks.core import Core as CoreTasks
+
+# from app.tasks.core import Core as CoreTasks
 from pydantic import BaseModel, Field
+
+# from app.domain.errors import BaseException
 
 
 class Log:
@@ -23,11 +25,10 @@ class Log:
         class Config:
             allow_population_by_field_name = True
 
-    def __init__(self, tasks: CoreTasks, config: dict, name: str = ""):
+    def __init__(self, config: dict, name: str = ""):
         self.__name: str = name
         self.__log: Logger = getLogger(name)
 
-        self.__tasks = tasks
         self.__conf = {"log": config["log"]}
         self.__gcp_active = "gcp" in config["log"]["log_handler"]
         self.__level = getLevelName(config["log"]["level"])
@@ -40,7 +41,7 @@ class Log:
         self.__with_debug = False
 
     def named(self, name: str) -> "Log":
-        return Log(self.__tasks, self.__conf, name)
+        return Log(self.__conf, name)
 
     def request(self, request: "Log.Request") -> "Log":
         """Add request data to log"""
@@ -59,10 +60,10 @@ class Log:
     def exception(self, err: Exception):
         log = self.__duplicate__()
 
-        if isinstance(err, BetException):
-            log.parameter("error", err.to_json())
-        else:
-            log.parameter("error", str(err))
+        # if isinstance(err, BaseException):
+        #     log.parameter("error", err.to_json())
+        # else:
+        log.parameter("error", str(err))
 
         return log
 
@@ -159,7 +160,7 @@ class Log:
         self.__reset()
 
     def _duplicate(self) -> "Log":
-        log = Log(self.__tasks, self.__conf)
+        log = Log(self.__conf)
         log.__is_base = False
 
         log.__name = self.__name
@@ -193,7 +194,7 @@ class Log:
         if not self.__is_base:
             return self
 
-        log = Log(self.__tasks, self.__conf, self.__name)
+        log = Log(self.__conf, self.__name)
         log.__is_base = False
 
         return log

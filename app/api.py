@@ -4,6 +4,7 @@ from time import time_ns
 from uuid import uuid4
 
 from asyncstdlib import itertools
+from dependency_injector.wiring import Provide
 from fastapi import HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -12,10 +13,11 @@ from sentry_sdk import capture_exception, push_scope
 from starlette.responses import StreamingResponse
 
 from app import router
-from app.domain.errors import BetException, Details, ErrInvalidData, ErrNotFound, ErrUnauthorized
+from app.dependencies import SlackGames
+from app.domain.errors import BaseException, Details, ErrInvalidData, ErrNotFound, ErrUnauthorized
 
 
-def run():
+def run(_=Provide[SlackGames.router]):
     # @router.middleware("http")
     # async def sentry_exception(request: Request, call_next):
     #     def __init_scope(scope, level: str = "error"):
@@ -53,7 +55,7 @@ def run():
         async def __exec(__req: Request) -> StreamingResponse | JSONResponse:
             try:
                 return await call_next(__req)
-            except BetException as e:
+            except BaseException as e:
                 return JSONResponse(
                     status_code=e.status,
                     content=jsonable_encoder(e.to_json()),
@@ -62,7 +64,7 @@ def run():
                 raise e
             except ValueError as e:
                 # __log_error.error("Unexpected value error when processing request", e)
-                valErr = ErrInvalidData("unknown", f"{e}", old_error=f"{e}")
+                valErr = ErrInvalidData("unknown", f"{e}")
                 return JSONResponse(
                     status_code=valErr.status,
                     content=jsonable_encoder(valErr.to_json()),
@@ -163,8 +165,6 @@ def run():
                 )
             )
 
-        e = ErrInvalidData("body", "bad request data", details)
-        e.status = 422
-        raise e
+        raise ErrInvalidData("body", "bad request data", details)
 
     return router
