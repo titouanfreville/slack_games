@@ -15,7 +15,6 @@ def _setup_logging(config) -> None:
         force=True,
         handlers=handlers,
     )
-    logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 
 class Core(DeclarativeContainer):
